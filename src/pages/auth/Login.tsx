@@ -1,6 +1,5 @@
-import * as React from 'react';
+import React, { useEffect, useCallback } from 'react';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
@@ -11,10 +10,14 @@ import Container from '@mui/material/Container';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import useAxios from 'axios-hooks';
+import { LoadingButton } from '@mui/lab';
 import Copyright from '../../components/Copyright';
 import Layout from '../../components/Layout';
 import RHFTextField from '../../components/form/RHFTextField';
 import Form from '../../components/form/Form';
+import config from '../../config';
+import useSnackbar from '../../hooks/useSnackbar';
 
 interface LoginFormInputs {
   username: string;
@@ -27,6 +30,16 @@ const schema = yup.object({
 }).required();
 
 export default function LoginPage() {
+  const snackbar = useSnackbar();
+
+  const [{ loading, error, data }, execute] = useAxios(
+    {
+      url: `${config.API_URL}/auth/token`,
+      method: 'POST',
+    },
+    { manual: true },
+  );
+
   const methods = useForm<LoginFormInputs>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -37,11 +50,33 @@ export default function LoginPage() {
 
   const {
     handleSubmit,
+    reset,
+    resetField,
   } = methods;
 
-  const onSubmit = async (data: LoginFormInputs) => {
-    console.log(data);
-  };
+  const onSubmit = useCallback(async (inputs: LoginFormInputs) => {
+    execute({
+      data: {
+        grant_type: 'implicit',
+        identity: inputs.username,
+        secret: inputs.password,
+      },
+    });
+  }, [execute]);
+
+  useEffect(() => {
+    if (error) {
+      snackbar.error(error.message);
+      resetField('password');
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (data) {
+      snackbar.success('Login successful');
+      reset();
+    }
+  }, [data]);
 
   return (
     <Layout>
@@ -64,17 +99,14 @@ export default function LoginPage() {
           <Form methods={methods} onSubmit={handleSubmit(onSubmit)}>
             <RHFTextField
               margin="normal"
-              required
               fullWidth
               id="username"
               label="Username"
               name="username"
               autoComplete="username"
-              autoFocus
             />
             <RHFTextField
               margin="normal"
-              required
               fullWidth
               name="password"
               label="Password"
@@ -82,14 +114,15 @@ export default function LoginPage() {
               id="password"
               autoComplete="current-password"
             />
-            <Button
+            <LoadingButton
               type="submit"
+              disabled={loading}
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
               Sign In
-            </Button>
+            </LoadingButton>
             <Grid container>
               <Grid item>
                 <Link href="/auth/register" variant="body2">

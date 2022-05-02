@@ -1,3 +1,4 @@
+import { SnackbarProvider } from 'notistack';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -8,6 +9,8 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <BrowserRouter>
-    <App />
+    <SnackbarProvider>
+      <App />
+    </SnackbarProvider>
   </BrowserRouter>,
 );
