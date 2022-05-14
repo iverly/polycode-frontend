@@ -1,3 +1,4 @@
+import { CssBaseline } from '@mui/material';
 import { SnackbarProvider } from 'notistack';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -10,6 +11,7 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <BrowserRouter>
+    <CssBaseline />
     <SnackbarProvider>
       <UserProvider>
         <App />
