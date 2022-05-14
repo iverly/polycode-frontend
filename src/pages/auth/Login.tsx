@@ -18,6 +18,7 @@ import RHFTextField from '../../components/form/RHFTextField';
 import Form from '../../components/form/Form';
 import config from '../../config';
 import useSnackbar from '../../hooks/useSnackbar';
+import useUser from '../../hooks/useUser';
 
 interface LoginFormInputs {
   username: string;
@@ -31,6 +32,7 @@ const schema = yup.object({
 
 export default function LoginPage() {
   const snackbar = useSnackbar();
+  const user = useUser();
 
   const [{ loading, error, data }, execute] = useAxios(
     {
@@ -74,9 +76,15 @@ export default function LoginPage() {
   useEffect(() => {
     if (data) {
       snackbar.success('Login successful');
+
+      user.setAuthorization({
+        accessToken: data.access_token,
+        refreshToken: data.refresh_token,
+      });
+
       reset();
     }
-  }, [data]);
+  }, [data, user.setAuthorization]);
 
   return (
     <Layout>
