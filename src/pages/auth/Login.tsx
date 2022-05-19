@@ -12,13 +12,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useAxios from 'axios-hooks';
 import { LoadingButton } from '@mui/lab';
+import { useNavigate } from 'react-router-dom';
 import Copyright from '../../components/Copyright';
 import Layout from '../../components/Layout';
 import RHFTextField from '../../components/form/RHFTextField';
 import Form from '../../components/form/Form';
-import config from '../../config';
 import useSnackbar from '../../hooks/useSnackbar';
-import useUser from '../../hooks/useUser';
+import useAuth from '../../hooks/useAuth';
 
 interface LoginFormInputs {
   username: string;
@@ -32,11 +32,12 @@ const schema = yup.object({
 
 export default function LoginPage() {
   const snackbar = useSnackbar();
-  const user = useUser();
+  const auth = useAuth();
+  const navigate = useNavigate();
 
   const [{ loading, error, data }, execute] = useAxios(
     {
-      url: `${config.API_URL}/auth/token`,
+      url: `${process.env.REACT_APP_API_ENDPOINT}/auth/token`,
       method: 'POST',
     },
     { manual: true },
@@ -76,15 +77,11 @@ export default function LoginPage() {
   useEffect(() => {
     if (data) {
       snackbar.success('Login successful');
-
-      user.setAuthorization({
-        accessToken: data.access_token,
-        refreshToken: data.refresh_token,
-      });
-
+      auth.setAccessToken(data.access_token);
+      navigate('/');
       reset();
     }
-  }, [data, user.setAuthorization]);
+  }, [data]);
 
   return (
     <Layout>
