@@ -1,9 +1,13 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import CardHeader from '@mui/material/CardHeader';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useNavigate } from 'react-router-dom';
+import { Skeleton } from '@mui/material';
 import LinearProgressWithLabel from '../LinearProgressWithLabel';
 
 export interface ChallengeCardProps {
@@ -13,19 +17,50 @@ export interface ChallengeCardProps {
   isCourse?: boolean;
   isSuccess?: boolean;
   progress?: number;
+  sx?: React.CSSProperties;
+  skeleton?: boolean;
+  onClick?: () => void;
 }
 
 export default function ChallengeCard({
-  title, description, isModule, isCourse, isSuccess, progress,
+  title, description, isModule, isCourse, isSuccess, progress, sx, skeleton, onClick,
 }: ChallengeCardProps) {
   const shouldIncludeProgress = isModule || isCourse;
   const shouldShowSuccess = isSuccess || (shouldIncludeProgress && progress === 1);
 
+  if (skeleton) {
+    return (
+      <Card
+        sx={{
+          height: '100%', display: 'flex', flexDirection: 'column',
+        }}
+      >
+        <CardContent sx={{ flexGrow: 1 }}>
+          <Typography variant="h3">
+            <Skeleton />
+          </Typography>
+          <Typography>
+            <Skeleton />
+          </Typography>
+          <Typography>
+            <Skeleton />
+          </Typography>
+          <Typography>
+            <Skeleton />
+          </Typography>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card
-      sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+      sx={{
+        height: '100%', display: 'flex', flexDirection: 'column', ...sx,
+      }}
+      onClick={onClick}
     >
-      {shouldIncludeProgress && (
+      {(shouldIncludeProgress || shouldShowSuccess) && (
         <CardHeader
           action={shouldShowSuccess && (
             <CheckCircleOutlineIcon color="success" />
@@ -35,12 +70,20 @@ export default function ChallengeCard({
           sx={{ mb: 0, pb: 0 }}
         />
       )}
+      {!shouldIncludeProgress && !shouldShowSuccess && (
+        <CardHeader
+          action={
+            <ArrowForwardIcon />
+          }
+          titleTypographyProps={{ variant: 'h6' }}
+          title={title}
+          sx={{ mb: 0, pb: 0 }}
+        />
+      )}
       <CardContent sx={{ flexGrow: 1 }}>
-        {!shouldIncludeProgress && (
-        <Typography variant="h6" sx={{ mb: 2 }}>
-          {title}
+        <Typography sx={{ mb: shouldIncludeProgress ? 2 : 0 }}>
+          {description}
         </Typography>
-        )}
         <Typography sx={{ mb: shouldIncludeProgress ? 2 : 0 }}>
           {description}
         </Typography>
@@ -57,4 +100,7 @@ ChallengeCard.defaultProps = {
   isCourse: false,
   isSuccess: false,
   progress: 0,
+  sx: {},
+  skeleton: false,
+  onClick: () => null,
 };
