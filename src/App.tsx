@@ -1,17 +1,19 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import Home from './pages';
+import HomePage from './pages';
 import LoginPage from './pages/auth/login';
 import RegisterPage from './pages/auth/register';
-import ExerciseEditor from './pages/exercise/[id]/editor';
+import VerifyEmailPage from './pages/auth/verify/[token]/email';
+import ExerciseEditorPage from './pages/exercise/[id]/editor';
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<HomePage />} />
       <Route path="/auth/login" element={<LoginPage />} />
       <Route path="/auth/register" element={<RegisterPage />} />
-      <Route path="/exercise/:exerciseId/editor" element={<ExerciseEditor />} />
+      <Route path="/auth/verify/:token/email" element={<VerifyEmailPage />} />
+      <Route path="/exercise/:exerciseId/editor" element={<ExerciseEditorPage />} />
     </Routes>
   );
 }
