@@ -12,7 +12,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import useAxios from 'axios-hooks';
 import { LoadingButton } from '@mui/lab';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import Copyright from '../../components/Copyright';
 import Layout from '../../components/Layout';
 import RHFTextField from '../../components/form/RHFTextField';
@@ -128,9 +128,9 @@ export default function LoginPage() {
             >
               Sign In
             </LoadingButton>
-            <Grid container>
+            <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="/auth/register" variant="body2">
+                <Link component={RouterLink} to="/auth/register" variant="body2">
                   Dont have an account? Sign Up
                 </Link>
               </Grid>

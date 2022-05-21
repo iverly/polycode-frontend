@@ -1,7 +1,8 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages';
-import LoginPage from './pages/auth/Login';
+import LoginPage from './pages/auth/login';
+import RegisterPage from './pages/auth/register';
 import ExerciseEditor from './pages/exercise/[id]/editor';
 
 function App() {
@@ -9,6 +10,7 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/auth/login" element={<LoginPage />} />
+      <Route path="/auth/register" element={<RegisterPage />} />
       <Route path="/exercise/:exerciseId/editor" element={<ExerciseEditor />} />
     </Routes>
   );
