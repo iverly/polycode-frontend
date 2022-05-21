@@ -21,12 +21,12 @@ import useSnackbar from '../../hooks/useSnackbar';
 import useAuth from '../../hooks/useAuth';
 
 interface LoginFormInputs {
-  username: string;
+  email: string;
   password: string;
 }
 
 const schema = yup.object({
-  username: yup.string().required(),
+  email: yup.string().email().required(),
   password: yup.string().required(),
 }).required();
 
@@ -46,7 +46,7 @@ export default function LoginPage() {
   const methods = useForm<LoginFormInputs>({
     resolver: yupResolver(schema),
     defaultValues: {
-      username: '',
+      email: '',
       password: '',
     },
   });
@@ -61,7 +61,7 @@ export default function LoginPage() {
     execute({
       data: {
         grant_type: 'implicit',
-        identity: inputs.username,
+        identity: inputs.email,
         secret: inputs.password,
       },
     });
@@ -105,10 +105,10 @@ export default function LoginPage() {
             <RHFTextField
               margin="normal"
               fullWidth
-              id="username"
-              label="Username"
-              name="username"
-              autoComplete="username"
+              id="email"
+              label="Email Address"
+              name="email"
+              autoComplete="email"
             />
             <RHFTextField
               margin="normal"
