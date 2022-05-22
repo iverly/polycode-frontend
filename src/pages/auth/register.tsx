@@ -18,12 +18,15 @@ import Layout from '../../components/Layout';
 import RHFTextField from '../../components/form/RHFTextField';
 import Form from '../../components/form/Form';
 import useSnackbar from '../../hooks/useSnackbar';
+import RHFCheckbox from '../../components/form/RHFCheckbox';
 
 interface RegisterFormInputs {
   email: string;
   username: string;
   password: string;
   repeatedPassword: string;
+  cgu: boolean;
+  age: boolean;
 }
 
 const schema = yup.object({
@@ -31,6 +34,8 @@ const schema = yup.object({
   username: yup.string().required(),
   password: yup.string().required(),
   repeatedPassword: yup.string().required(),
+  cgu: yup.boolean().isTrue('You must accept the terms and conditions').required(),
+  age: yup.boolean().isTrue('You must be over 13 to use PolyCode').required(),
 }).required();
 
 export default function RegisterPage() {
@@ -52,6 +57,8 @@ export default function RegisterPage() {
       username: '',
       password: '',
       repeatedPassword: '',
+      cgu: false,
+      age: false,
     },
   });
 
@@ -152,12 +159,10 @@ export default function RegisterPage() {
                   autoComplete="new-password"
                 />
               </Grid>
-              {/* <Grid item xs={12}>
-                <FormControlLabel
-                  control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
-                />
-              </Grid> */}
+              <Grid item xs={12}>
+                <RHFCheckbox name="age" label="I certify that I am over 13 years old" />
+                <RHFCheckbox name="cgu" label="I accept the terms and conditions" />
+              </Grid>
             </Grid>
             <LoadingButton
               type="submit"
