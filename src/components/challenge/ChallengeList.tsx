@@ -57,6 +57,7 @@ export default function ChallengeList(
               description={challenge.description}
               isCourse={(challenge as Module).exercises && !!(challenge as Course).modules}
               isModule={(challenge as Module).exercises && !(challenge as Course).modules}
+              isSuccess={(challenge as any).isSuccess}
               sx={{ ...(clickable && { cursor: 'pointer' }) }}
               onClick={() => { if (clickable) navigate(`/exercise/${challenge.id}/editor`); }}
               progress={Math.random() * 1}

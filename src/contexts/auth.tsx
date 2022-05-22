@@ -9,7 +9,7 @@ export interface AuthentificationProperties {
   accessToken?: string;
   // eslint-disable-next-line no-unused-vars
   setAccessToken(accessToken: AuthentificationProperties['accessToken']): void;
-  headers: Record<string, string>;
+  headers: Record<string, string> | undefined;
   // eslint-disable-next-line no-unused-vars
   login(accessToken: string): void;
   logout(): void;
@@ -68,7 +68,10 @@ const useProvideContext = (): AuthentificationProperties => {
     isAuthenticated,
     accessToken,
     setAccessToken,
-    headers: useMemo(() => ({ Authorization: `Bearer ${accessToken}` }), [accessToken]),
+    headers: useMemo(() => {
+      if (!accessToken) return undefined;
+      return { Authorization: `Bearer ${accessToken}` };
+    }, [accessToken]),
     login,
     logout: useCallback(() => {
       setIsAuthenticated(false);

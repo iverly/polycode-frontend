@@ -1,4 +1,5 @@
-import React, { useEffect } from 'react';
+/* eslint-disable no-unused-vars */
+import React, { useEffect, useState } from 'react';
 import useAxios from 'axios-hooks';
 import Hero from '../components/Hero';
 import AppBar from '../components/AppBar';
@@ -6,9 +7,19 @@ import Footer from '../components/Footer';
 import ChallengeList from '../components/challenge/ChallengeList';
 import { Course, Exercise, Module } from '../types/challenges';
 import useSnackbar from '../hooks/useSnackbar';
+import useAuth from '../hooks/useAuth';
 
 export default function Home() {
+  const auth = useAuth();
   const snackbar = useSnackbar();
+
+  const [submissions, setSubmissions] = useState(undefined);
+
+  const [{
+    loading: submissionsLoading,
+    error: submissionsError,
+    data: submissionsData,
+  }, submissionsExecute] = useAxios(`${process.env.REACT_APP_API_ENDPOINT}/user/@me/submissions`, { manual: true });
 
   const [{
     loading: exercisesLoading,
@@ -35,6 +46,16 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    if (auth.isAuthenticated && auth.headers) {
+      submissionsExecute({
+        headers: {
+          ...auth.headers,
+        },
+      });
+    }
+  }, [auth.isAuthenticated, auth.headers]);
+
+  useEffect(() => {
     if (exercisesError) {
       snackbar.error('Error while loading exercises.');
     }
@@ -46,7 +67,46 @@ export default function Home() {
     if (coursesError) {
       snackbar.error('Error while loading courses.');
     }
-  }, [exercisesError, modulesError, coursesError]);
+
+    if (submissionsError) {
+      snackbar.error('Error while loading your submissions.');
+    }
+  }, [exercisesError, modulesError, coursesError, submissionsError]);
+
+  useEffect(() => {
+    if (submissionsData) {
+      setSubmissions(submissionsData.map((challenge: any) => {
+        if (challenge.type === 'exercise') {
+          return {
+            id: challenge.id,
+            name: challenge.name,
+            description: challenge.description,
+            isSuccess: challenge.submissions.some(
+              (submission: any) => submission.execution?.success,
+            ),
+          };
+        } if (challenge.type === 'module') {
+          return challenge.exercises.map((exercise: any) => ({
+            id: exercise.id,
+            name: exercise.name,
+            description: exercise.description,
+            isSuccess: exercise.submissions.some(
+              (submission: any) => submission.execution?.success,
+            ),
+          })).flat();
+        }
+
+        return challenge.modules.map((module: any) => module.exercises.map((exercise: any) => ({
+          id: exercise.id,
+          name: exercise.name,
+          description: exercise.description,
+          isSuccess: exercise.submissions.some(
+            (submission: any) => submission.execution?.success,
+          ),
+        }))).flat().flat();
+      }).flat());
+    }
+  }, [submissionsData]);
 
   return (
     <>
@@ -55,7 +115,8 @@ export default function Home() {
         <Hero />
         <ChallengeList
           title="Last viewed"
-          challenges={[]}
+          skeleton={submissionsLoading}
+          challenges={submissions || []}
           negativeTop
           clickable
         />
@@ -63,7 +124,7 @@ export default function Home() {
           title="Courses"
           skeleton={coursesLoading}
           challenges={coursesData || []}
-          negativeTop={!coursesLoading}
+          negativeTop={!submissions}
         />
         <ChallengeList
           title="Modules"
