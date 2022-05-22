@@ -52,6 +52,8 @@ export default function Home() {
           ...auth.headers,
         },
       });
+    } else {
+      setSubmissions(undefined);
     }
   }, [auth.isAuthenticated, auth.headers]);
 
