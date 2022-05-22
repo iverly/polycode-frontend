@@ -77,7 +77,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (data) {
       snackbar.success('Login successful');
-      auth.setAccessToken(data.access_token);
+      auth.login(data.access_token);
       navigate('/');
       reset();
     }

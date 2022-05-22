@@ -9,6 +9,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@mui/material';
 import LinearProgressWithLabel from '../LinearProgressWithLabel';
+import useAuth from '../../hooks/useAuth';
 
 export interface ChallengeCardProps {
   title: string;
@@ -25,8 +26,11 @@ export interface ChallengeCardProps {
 export default function ChallengeCard({
   title, description, isModule, isCourse, isSuccess, progress, sx, skeleton, onClick,
 }: ChallengeCardProps) {
+  const auth = useAuth();
+
   const shouldIncludeProgress = isModule || isCourse;
-  const shouldShowSuccess = isSuccess || (shouldIncludeProgress && progress === 1);
+  const shouldShowSuccess = auth.isAuthenticated
+  && (isSuccess || (shouldIncludeProgress && progress === 1));
 
   if (skeleton) {
     return (
@@ -73,7 +77,7 @@ export default function ChallengeCard({
       {!shouldIncludeProgress && !shouldShowSuccess && (
         <CardHeader
           action={
-            <ArrowForwardIcon />
+            auth.isAuthenticated && <ArrowForwardIcon />
           }
           titleTypographyProps={{ variant: 'h6' }}
           title={title}
@@ -81,13 +85,10 @@ export default function ChallengeCard({
         />
       )}
       <CardContent sx={{ flexGrow: 1 }}>
-        <Typography sx={{ mb: shouldIncludeProgress ? 2 : 0 }}>
+        <Typography sx={{ mb: (auth.isAuthenticated && shouldIncludeProgress) ? 2 : 0 }}>
           {description}
         </Typography>
-        <Typography sx={{ mb: shouldIncludeProgress ? 2 : 0 }}>
-          {description}
-        </Typography>
-        {shouldIncludeProgress && (
+        {(auth.isAuthenticated && shouldIncludeProgress) && (
           <LinearProgressWithLabel value={(progress || 0) * 100} />
         )}
       </CardContent>
