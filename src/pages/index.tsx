@@ -124,7 +124,7 @@ export default function Home() {
           title="Courses"
           skeleton={coursesLoading}
           challenges={coursesData || []}
-          negativeTop={!submissions}
+          negativeTop={(!submissionsLoading && !submissionsData) || !submissions}
         />
         <ChallengeList
           title="Modules"
